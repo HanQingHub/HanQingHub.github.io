@@ -282,6 +282,7 @@ nav.menu::after{content:"";position:absolute;bottom:0;right:0;width:12px;height:
 @keyframes orbit-spin{to{transform:rotate(360deg)}}
 
 /* ============ PAPER CARDS ============ */
+section#papers{overflow:visible;position:relative;z-index:2;content-visibility:visible}
 .papers{display:flex;flex-direction:column;gap:clamp(24px,3vw,40px)}
 .paper .frame-in{
   display:grid;gap:clamp(24px,3vw,48px);align-items:center;
@@ -335,26 +336,53 @@ nav.menu::after{content:"";position:absolute;bottom:0;right:0;width:12px;height:
   border-top:1.5px solid var(--acc);border-left:1.5px solid var(--acc);
 }
 
-/* ============ ATLAS — paper collection (index row → hover expand L1 → FULL RECORD expand L2) ============ */
-.atlas-item{position:relative}
+/* ============ ATLAS — paper collection (index rail → curtain reveal RIGHT → FULL RECORD expand down) ============ */
+.atlas-item{--railW:clamp(60px,6.5vw,80px);position:relative;display:flex;align-items:stretch}
 .atlas-item + .atlas-item{margin-top:clamp(14px,2vw,22px)}
-/* rail — always-on index row */
-.atlas-rail{display:flex;align-items:center;gap:14px;padding:8px 2px;cursor:pointer}
-.ai-diamond{width:8px;height:8px;flex:none;background:var(--seed-primary);transform:rotate(45deg);transition:box-shadow .3s}
-.atlas-item:hover .ai-diamond,.atlas-item:focus-within .ai-diamond{box-shadow:0 0 12px color-mix(in srgb,var(--seed-primary) 60%,transparent)}
-.ai-no{font-family:var(--font-mono);font-size:11px;letter-spacing:.22em;color:var(--seed-fg);line-height:1}
-.ai-line{flex:1;height:1px;background:linear-gradient(90deg,var(--hairline),transparent);transition:background .35s}
-.atlas-item:hover .ai-line,.atlas-item:focus-within .ai-line{background:linear-gradient(90deg,color-mix(in srgb,var(--seed-primary) 55%,var(--hairline)),transparent)}
-/* panel — level 1 (expand from index) */
-.atlas-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .52s cubic-bezier(.22,.61,.2,1)}
-.atlas-item:hover .atlas-panel,.atlas-item:focus-within .atlas-panel{grid-template-rows:1fr}
-.ap-inner{overflow:hidden;min-height:0}
+/* rail — always-on index column */
+.atlas-rail{
+  width:var(--railW);flex:none;position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:18px 0 16px;cursor:pointer;min-height:clamp(84px,9vw,110px);
+}
+.ai-diamond{
+  width:9px;height:9px;flex:none;background:var(--seed-primary);transform:rotate(45deg);
+  transition:transform .45s cubic-bezier(.22,.61,.2,1),box-shadow .45s;
+}
+.atlas-item:hover .ai-diamond,.atlas-item:focus-within .ai-diamond{
+  transform:rotate(45deg) scale(1.4);
+  box-shadow:0 0 16px color-mix(in srgb,var(--seed-primary) 70%,transparent);
+}
+.ai-no{font-family:var(--font-mono);font-size:11px;letter-spacing:.22em;color:var(--seed-fg);line-height:1;transition:color .35s}
+.atlas-item:hover .ai-no,.atlas-item:focus-within .ai-no{color:var(--seed-primary)}
+.ai-line{flex:1;width:1px;background:linear-gradient(180deg,var(--hairline),transparent);transition:background .4s}
+.atlas-item:hover .ai-line,.atlas-item:focus-within .ai-line{background:linear-gradient(180deg,var(--seed-primary),transparent)}
+/* panel — level 1: curtain reveal (fixed width, no reflow; clip sweeps content in from the left edge) */
+.atlas-panel{
+  position:absolute;left:var(--railW);top:0;width:calc(100% - var(--railW));z-index:20;
+  opacity:0;transform:translateY(8px);clip-path:inset(0 0 0 100%);
+  filter:drop-shadow(0 26px 42px rgba(4,8,10,.5));
+  transition:
+    clip-path .6s cubic-bezier(.22,.61,.2,1),
+    opacity .3s ease,
+    transform .6s cubic-bezier(.22,.61,.2,1);
+}
+.atlas-item:hover .atlas-panel,.atlas-item:focus-within .atlas-panel{
+  opacity:1;transform:none;clip-path:inset(0 0 0 0);
+}
+.ap-inner{
+  overflow:hidden;min-width:0;
+  opacity:0;transform:translateX(16px);
+  transition:opacity .4s ease .13s,transform .55s cubic-bezier(.22,.61,.2,1) .13s;
+}
+.atlas-item:hover .ap-inner,.atlas-item:focus-within .ap-inner{opacity:1;transform:none}
 .ap-card{
-  position:relative;margin:2px 0 0;
+  position:relative;margin:0 0 0 2px;
   display:flex;align-items:center;gap:clamp(16px,2.2vw,28px);
   background:linear-gradient(160deg,#111518,#0A0D0F);
   border:1px solid rgba(14,143,150,.26);border-left:2px solid rgba(14,143,150,.45);
   padding:clamp(16px,2vw,24px) clamp(20px,2.4vw,32px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 0 42px rgba(14,143,150,.05);
   clip-path:polygon(var(--seed-cut) 0,calc(100% - var(--seed-cut)) 0,100% var(--seed-cut),100% calc(100% - var(--seed-cut)),calc(100% - var(--seed-cut)) 100%,var(--seed-cut) 100%,0 calc(100% - var(--seed-cut)),0 var(--seed-cut));
 }
 .ap-card::after{
@@ -428,6 +456,8 @@ nav.menu::after{content:"";position:absolute;bottom:0;right:0;width:12px;height:
 .ad-pdf:hover{background:#11A8AD;transform:translateY(-2px)}
 /* responsive */
 @media (max-width:640px){
+  .atlas-item{--railW:44px}
+  .ai-no{font-size:10px}
   .ad-card{grid-template-columns:1fr}
 }
 
