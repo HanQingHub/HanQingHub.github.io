@@ -351,9 +351,10 @@ nav.menu::after{content:"";position:absolute;bottom:0;right:0;width:12px;height:
 .ap-inner{overflow:hidden;min-height:0}
 .ap-card{
   position:relative;margin:2px 0 0;
+  display:flex;align-items:center;gap:clamp(16px,2.2vw,28px);
   background:linear-gradient(160deg,#111518,#0A0D0F);
-  border:1px solid rgba(14,143,150,.26);border-top:2px solid rgba(14,143,150,.45);
-  padding:clamp(22px,2.6vw,32px) clamp(22px,2.8vw,38px) clamp(16px,2vw,22px);
+  border:1px solid rgba(14,143,150,.26);border-left:2px solid rgba(14,143,150,.45);
+  padding:clamp(16px,2vw,24px) clamp(20px,2.4vw,32px);
   clip-path:polygon(var(--seed-cut) 0,calc(100% - var(--seed-cut)) 0,100% var(--seed-cut),100% calc(100% - var(--seed-cut)),calc(100% - var(--seed-cut)) 100%,var(--seed-cut) 100%,0 calc(100% - var(--seed-cut)),0 var(--seed-cut));
 }
 .ap-card::after{
@@ -361,18 +362,19 @@ nav.menu::after{content:"";position:absolute;bottom:0;right:0;width:12px;height:
   border-top:1.5px solid var(--seed-primary);border-right:1.5px solid var(--seed-primary);opacity:.8;
 }
 .ap-tag{
-  position:relative;display:inline-block;margin-bottom:14px;
+  position:relative;flex:none;margin:0;
   font-family:var(--font-mono);font-size:10px;letter-spacing:.26em;color:var(--seed-primary);
-  border:1px solid rgba(14,143,150,.35);padding:4px 10px;background:rgba(14,143,150,.06);
+  border:1px solid rgba(14,143,150,.35);padding:6px 10px;background:rgba(14,143,150,.06);
 }
+.ap-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
 .ap-title{
-  font-family:var(--font-lat-disp);font-weight:500;font-size:clamp(18px,1.9vw,24px);
-  line-height:1.38;letter-spacing:.02em;color:#EAF0EE;text-wrap:balance;max-width:60ch;
+  font-family:var(--font-lat-disp);font-weight:500;font-size:clamp(17px,1.8vw,23px);
+  line-height:1.35;letter-spacing:.02em;color:#EAF0EE;text-wrap:balance;max-width:62ch;
 }
-.ap-zh{font-family:var(--font-zh-disp);font-size:clamp(13px,1.35vw,16px);letter-spacing:.07em;color:#8CA09D;margin-top:9px}
+.ap-zh{font-family:var(--font-zh-disp);font-size:clamp(13px,1.3vw,15.5px);letter-spacing:.07em;color:#8CA09D;margin:0}
 /* level-2 trigger */
 .ap-full{
-  display:inline-flex;align-items:center;gap:10px;cursor:pointer;border:none;margin:18px 0 0;padding:10px 16px 9px 18px;
+  display:inline-flex;align-items:center;gap:10px;cursor:pointer;border:none;margin:0;padding:11px 16px 10px 18px;
   font-family:var(--font-mono);font-size:10.5px;letter-spacing:.24em;color:var(--seed-primary);
   background:rgba(14,143,150,.07);
   clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);
@@ -383,9 +385,9 @@ nav.menu::after{content:"";position:absolute;bottom:0;right:0;width:12px;height:
 .ap-full:hover .arr,.ap-full:focus-visible .arr{transform:translateX(7px)}
 /* level-2 detail (expands under trigger) */
 .atlas-detail{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.22,.61,.2,1) .03s}
-.atlas-item:hover .ap-full:hover ~ .atlas-detail,
+.atlas-item:hover .ap-card:has(.ap-full:hover) ~ .atlas-detail,
 .atlas-item:hover .atlas-detail:hover,
-.atlas-item:focus-within .ap-full:focus ~ .atlas-detail,
+.atlas-item:focus-within .ap-card:has(.ap-full:focus) ~ .atlas-detail,
 .atlas-item:focus-within .atlas-detail:focus-within{grid-template-rows:1fr}
 .ad-inner{overflow:hidden;min-height:0}
 .ad-card{
@@ -887,7 +889,12 @@ nav.menu a:hover::after{transform:translateX(230%)}
         <span class="sec-rule"></span>
       </div>
 
-      <div class="papers" id="papers-root">\n      </div>\n    </div>\n  </section>\n\n<!-- ============ SHELF ============ -->
+            <div class="papers" id="papers-root">
+      </div>
+    </div>
+  </section>
+
+<!-- ============ SHELF ============ -->
 <section id="shelf" class="shelf-band" data-component="Shelf" data-od-id="shelf">
     <div class="wrap">
       <div class="sec-head" data-reveal>
@@ -902,7 +909,9 @@ nav.menu a:hover::after{transform:translateX(230%)}
           <span class="rh-mark">PRISM · RESERVE</span>
           <span class="rh-idx" id="shelf-range"></span>
         </div>
-        <div class="shelf" id="shelf-root">\n        </div>\n        <div class="shelf-board" aria-hidden="true"></div>
+                <div class="shelf" id="shelf-root">
+        </div>
+        <div class="shelf-board" aria-hidden="true"></div>
       </div>
     </div>
   </section>
@@ -1120,13 +1129,15 @@ nav.menu a:hover::after{transform:translateX(230%)}
       '<div class="atlas-panel"><div class="ap-inner">' +
         '<div class="ap-card">' +
           '<span class="ap-tag">PAPER ' + no + ' · ' + tag2 + '</span>' +
-          '<h3 class="ap-title">' + title + '</h3>' + zh +
+          '<div class="ap-mid">' +
+            '<h3 class="ap-title">' + title + '</h3>' + zh +
+          '</div>' +
           '<button type="button" class="ap-full" tabindex="0">FULL RECORD <i class="arr" aria-hidden="true">&#10230;</i></button>' +
-          '<div class="atlas-detail"><div class="ad-inner"><div class="ad-card">' +
-            '<figure class="ad-fig">' + fig + cap + '</figure>' +
-            '<div class="ad-side">' + ab + meta + pdf + '</div>' +
-          '</div></div></div>' +
         '</div>' +
+        '<div class="atlas-detail"><div class="ad-inner"><div class="ad-card">' +
+          '<figure class="ad-fig">' + fig + cap + '</figure>' +
+          '<div class="ad-side">' + ab + meta + pdf + '</div>' +
+        '</div></div></div>' +
       '</div></div>' +
     '</article>';
   }
