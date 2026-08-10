@@ -770,6 +770,212 @@
       #settings-panel { width: calc(100vw - 24px); max-width: 360px; top: 48px; left: 12px; }
       #settings-toggle { width: 30px; height: 30px; font-size: 0.95rem; }
     }
+
+    /* ===== Onboarding Tour ===== */
+    #tour-overlay {
+      position: fixed; inset: 0; z-index: 60;
+      pointer-events: none;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.55s ease, visibility 0.55s;
+    }
+    #tour-overlay.on { opacity: 1; visibility: visible; }
+    #tour-overlay .spot {
+      position: absolute; inset: 0;
+      background: rgba(2, 2, 4, 0.52);
+      -webkit-mask-image: radial-gradient(circle at var(--sx) var(--sy), transparent 0, transparent var(--sr), #000 calc(var(--sr) + 70px));
+      mask-image: radial-gradient(circle at var(--sx) var(--sy), transparent 0, transparent var(--sr), #000 calc(var(--sr) + 70px));
+    }
+    #tour-ring {
+      position: fixed; z-index: 61; pointer-events: none;
+      border: 1.5px solid var(--hud); border-radius: 10px;
+      box-shadow: 0 0 24px rgba(0, 245, 196, 0.22), inset 0 0 18px rgba(0, 245, 196, 0.08);
+      opacity: 0; transform: scale(0.96);
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), left 0.4s ease, top 0.4s ease, width 0.4s ease, height 0.4s ease;
+    }
+    #tour-ring.on { opacity: 1; transform: scale(1); }
+    #tour-ring::before, #tour-ring::after {
+      content: ''; position: absolute; width: 10px; height: 10px;
+      border: 2px solid var(--hud); pointer-events: none;
+    }
+    #tour-ring::before { left: -1px; top: -1px; border-right: none; border-bottom: none; }
+    #tour-ring::after { right: -1px; bottom: -1px; border-left: none; border-top: none; }
+    #tour-ring .pulse {
+      position: absolute; inset: -1px; border-radius: 10px;
+      border: 1px solid var(--hud); opacity: 0;
+      animation: tourPulse 2s cubic-bezier(0.22, 0.61, 0.2, 1) infinite;
+    }
+    @keyframes tourPulse {
+      0% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(1.18); opacity: 0; }
+    }
+
+    #tour-card {
+      position: fixed; z-index: 62;
+      width: min(340px, 88vw);
+      pointer-events: auto;
+      background: linear-gradient(160deg, rgba(10, 14, 20, 0.92), rgba(3, 5, 9, 0.94));
+      border: 1px solid rgba(0, 245, 196, 0.22);
+      border-radius: 18px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 32px rgba(0, 245, 196, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+      padding: 22px 24px 18px;
+      opacity: 0; transform: translateY(14px) scale(0.96);
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 0.61, 0.2, 1);
+    }
+    #tour-card.on { opacity: 1; transform: none; }
+    #tour-card .tour-no {
+      position: absolute; top: 14px; right: 18px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; color: var(--text-dim); opacity: 0.75;
+    }
+    #tour-card .tour-zh {
+      display: block;
+      font-family: 'Noto Serif SC', 'Oranienbaum', serif;
+      font-size: 1.25rem; font-weight: 500; letter-spacing: 0.14em;
+      color: var(--text); margin: 0;
+    }
+    #tour-card .tour-en {
+      display: block;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.34em; color: var(--hud); margin-top: 6px;
+      text-transform: uppercase;
+    }
+    #tour-card .tour-glyph {
+      height: 76px; margin: 16px 0 12px;
+      display: grid; place-items: center;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      background: radial-gradient(ellipse at center, rgba(0, 245, 196, 0.05), transparent 70%);
+    }
+    #tour-card .tour-glyph svg { width: 132px; height: 64px; }
+    #tour-card .tour-text {
+      font-size: 0.82rem; line-height: 1.75; letter-spacing: 0.03em;
+      color: var(--text-dim); margin: 0;
+    }
+    #tour-card .tour-hint {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.06em; line-height: 1.6; color: var(--node);
+      margin: 12px 0 0; padding: 9px 11px;
+      border: 1px solid rgba(0, 245, 196, 0.18);
+      border-radius: 8px;
+      background: rgba(0, 245, 196, 0.05);
+    }
+    #tour-card .tour-hint::before {
+      content: '▸'; flex: none; color: var(--hud);
+    }
+    #tour-card .tour-hint b { color: var(--text); font-weight: 500; }
+    #tour-card .tour-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 16px;
+    }
+    #tour-card .tour-dots { display: flex; gap: 7px; }
+    #tour-card .tour-dots i {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+      transition: all 0.3s ease;
+    }
+    #tour-card .tour-dots i.cur {
+      background: var(--hud);
+      box-shadow: 0 0 8px var(--hud);
+      transform: scale(1.35);
+    }
+    #tour-card .tour-dots i.done { background: var(--node); opacity: 0.8; }
+    #tour-card .tour-btns { display: flex; gap: 8px; align-items: center; }
+    #tour-card .tour-btn {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      border-radius: 7px; padding: 7px 12px; cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    #tour-card .tour-btn.ghost {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: transparent; color: var(--text-dim);
+    }
+    #tour-card .tour-btn.ghost:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.35); }
+    #tour-card .tour-btn.primary {
+      border: 1px solid var(--hud);
+      background: rgba(0, 245, 196, 0.12);
+      color: var(--node);
+      box-shadow: 0 0 14px rgba(0, 245, 196, 0.18);
+    }
+    #tour-card .tour-btn.primary:hover {
+      background: var(--hud);
+      color: #041012;
+      box-shadow: 0 0 22px rgba(0, 245, 196, 0.5);
+    }
+    #tour-card .tour-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+    #tour-card.done-step .tour-btn.primary {
+      border-color: var(--pulse); color: var(--pulse);
+      background: rgba(255, 209, 102, 0.1);
+      box-shadow: 0 0 14px rgba(255, 209, 102, 0.2);
+    }
+
+    /* ---- tour demo glyphs ---- */
+    .g-node { fill: var(--node); filter: drop-shadow(0 0 10px var(--hud)); }
+    .g-halo { fill: none; stroke: var(--hud); stroke-width: 1.4; animation: haloPulse 2.4s ease-out infinite; }
+    @keyframes haloPulse { 0% { r: 9px; opacity: 0.9; } 100% { r: 26px; opacity: 0; } }
+    .g-link path { stroke: rgba(255, 255, 255, 0.14); stroke-width: 1.1; animation: linkGlow 2.4s ease-in-out infinite; }
+    .g-link circle { fill: var(--text-dim); }
+    .g-link.d1 path { animation-delay: 0.12s; } .g-link.d2 path { animation-delay: 0.24s; }
+    .g-link.d3 path { animation-delay: 0.36s; } .g-link.d4 path { animation-delay: 0.48s; }
+    @keyframes linkGlow { 0%, 100% { stroke: rgba(255, 255, 255, 0.14); } 50% { stroke: var(--hud); } }
+    .g-flash { fill: none; stroke: #fff; stroke-width: 2; opacity: 0; }
+    .g-flash.f1 { animation: flashOut 0.45s ease-out 0.55s 1; }
+    .g-flash.f2 { animation: flashOut 0.45s ease-out 1.15s 1; }
+    @keyframes flashOut { 0% { opacity: 0.9; transform: scale(0.7); } 100% { opacity: 0; transform: scale(1.9); } }
+    .g-node.gold { animation: pinGold 0.6s ease 1.7s forwards; }
+    @keyframes pinGold { to { fill: var(--pulse); filter: drop-shadow(0 0 12px var(--pulse)); } }
+    .g-anchor { stroke: var(--pulse); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0; animation: anchorIn 0.5s ease 1.7s forwards; }
+    @keyframes anchorIn { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+    .g-ring path { fill: rgba(255, 255, 255, 0.04); stroke: rgba(255, 255, 255, 0.14); stroke-width: 1; animation: ringSeg 3.2s ease-in-out infinite; }
+    .g-ring path:nth-child(2) { animation-delay: 0.5s; } .g-ring path:nth-child(3) { animation-delay: 1s; }
+    .g-ring path:nth-child(4) { animation-delay: 1.5s; } .g-ring path:nth-child(5) { animation-delay: 2s; }
+    .g-ring path:nth-child(6) { animation-delay: 2.5s; }
+    @keyframes ringSeg { 0%, 100% { stroke: rgba(255, 255, 255, 0.14); fill: rgba(255, 255, 255, 0.04); } 25% { stroke: var(--hud); fill: rgba(0, 245, 196, 0.12); } }
+    .g-slider line { stroke: rgba(255, 255, 255, 0.14); stroke-width: 3; stroke-linecap: round; }
+    .g-thumb-g { animation: thumbMove 3s ease-in-out infinite; }
+    .g-thumb-g circle { fill: var(--hud); filter: drop-shadow(0 0 8px var(--hud)); }
+    .g-thumb-g line { stroke: var(--hud); stroke-width: 1.5; }
+    @keyframes thumbMove { 0%, 100% { transform: translateX(0); } 45%, 55% { transform: translateX(96px); } }
+    .g-slider text { fill: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.1em; }
+    .g-slider .g-sv { opacity: 0; animation: svBlink 3s ease-in-out infinite; }
+    .g-slider .g-sv.s2 { animation-delay: 1s; } .g-slider .g-sv.s3 { animation-delay: 2s; }
+    @keyframes svBlink { 0%, 30%, 100% { opacity: 0; } 40%, 60% { opacity: 1; } }
+    .g-navc { fill: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.24em; }
+    #ring-nav.tour-demo .nav-segment path { animation: navSegTour 1.6s ease-in-out infinite; }
+    #ring-nav.tour-demo .nav-segment:nth-child(2) path { animation-delay: 0.26s; }
+    #ring-nav.tour-demo .nav-segment:nth-child(3) path { animation-delay: 0.52s; }
+    #ring-nav.tour-demo .nav-segment:nth-child(4) path { animation-delay: 0.78s; }
+    #ring-nav.tour-demo .nav-segment:nth-child(5) path { animation-delay: 1.04s; }
+    #ring-nav.tour-demo .nav-segment:nth-child(6) path { animation-delay: 1.3s; }
+    @keyframes navSegTour { 0%, 100% { stroke: rgba(255, 255, 255, 0.12); fill: rgba(255, 255, 255, 0.04); } 50% { stroke: var(--hud); fill: rgba(0, 245, 196, 0.14); } }
+
+    #tour-replay {
+      position: fixed; z-index: 40;
+      bottom: 198px; right: 22px;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(2, 2, 4, 0.65);
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; line-height: 1;
+      cursor: pointer;
+      display: grid; place-items: center;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+    }
+    #tour-replay:hover {
+      border-color: var(--hud); color: var(--hud);
+      box-shadow: 0 0 12px rgba(0, 245, 196, 0.25);
+    }
+    #tour-replay.hidden { display: none; }
+    @media (pointer: coarse), (max-width: 768px) {
+      #tour-replay { bottom: 132px; right: 14px; width: 30px; height: 30px; font-size: 0.85rem; }
+      #tour-card { padding: 18px 18px 14px; }
+    }
   </style>
 </head>
 <body>
@@ -964,6 +1170,26 @@
   <div id="theme-overlay"></div>
   <div id="flash"></div>
   <div id="scanline"></div>
+
+  <div id="tour-overlay"><div class="spot"></div></div>
+  <div id="tour-ring"><span class="pulse"></span></div>
+  <div id="tour-card">
+    <span class="tour-no">01 / 04</span>
+    <span class="tour-zh"></span>
+    <span class="tour-en"></span>
+    <div class="tour-glyph"></div>
+    <p class="tour-text"></p>
+    <p class="tour-hint"></p>
+    <div class="tour-foot">
+      <div class="tour-dots"></div>
+      <div class="tour-btns">
+        <button type="button" class="tour-btn ghost" id="tour-skip">跳过</button>
+        <button type="button" class="tour-btn ghost" id="tour-prev">上一步</button>
+        <button type="button" class="tour-btn primary" id="tour-next">下一步</button>
+      </div>
+    </div>
+  </div>
+  <button id="tour-replay" title="操作引导" aria-label="操作引导">?</button>
 
   <div id="loader">
     <div class="loader-content" id="loader-content">
@@ -2051,7 +2277,7 @@
       const CONFIG = {
         desktopMaxNodes: 420,
         mobileMaxNodes: 200,
-        apiTimeout: 1500,
+        apiTimeout: 800,
         cacheSize: 64,
         breathingPeriod: 4,
         pulseSpeed: 3.5,
@@ -6683,6 +6909,28 @@
       let _sharedParticleTexture = null;
       let _sharedSphereGeo = null;
 
+      // === Per-category node colors (derived from theme, cached per theme) ===
+      function computeCategoryColors(theme) {
+        const w = new THREE.Color('#ffffff');
+        const a = theme.nodeA, b = theme.nodeB, p = theme.pulse;
+        return {
+          tech: a.clone(),
+          nature: a.clone().lerp(p, 0.5),
+          emotion: b.clone(),
+          abstract: b.clone().lerp(w, 0.3),
+          society: p.clone(),
+          fusion: p.clone(),
+          hub: a.clone().lerp(w, 0.25),
+          default: a.clone(),
+        };
+      }
+      function getNodeColorKey(n) {
+        if (n.level === 0) return 'hub';
+        if (n.isSpark) return 'fusion';
+        return n.category || 'default';
+      }
+      let _catColors = computeCategoryColors(THEMES.bio);
+
       const app = {
         scene: null, camera: null, renderer: null, controls: null,
         raycaster: new THREE.Raycaster(), pointer: new THREE.Vector2(), clock: new THREE.Clock(),
@@ -7442,7 +7690,7 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
         const norm = normalizeWord(word);
         const inputNorms = new Set((contextWords || []).map(w => normalizeWord(typeof w === 'string' ? w : (w.word || ''))));
         inputNorms.add(norm);
-        const timeout = 1500;
+        const timeout = CONFIG.apiTimeout;
         const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), timeout));
         const results = [];
         try {
@@ -7931,7 +8179,8 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
           const roots = nodes.filter(n => n.level === 0);
           const nonRoots = nodes.filter(n => n.level !== 0);
           nonRoots.sort((a, b) => (b.weight || 0) - (a.weight || 0));
-          const keptNonRoots = nonRoots.slice(0, maxNodes - roots.length);
+          const maxNonRoots = Math.max(0, maxNodes - roots.length);
+          const keptNonRoots = nonRoots.slice(0, maxNonRoots);
           nodes = [...roots, ...keptNonRoots];
           const keptIds = new Set(nodes.map(n => n.id));
           links = links.filter(l => keptIds.has(l.source) && keptIds.has(l.target));
@@ -8580,14 +8829,12 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
         const colors = new Float32Array(app.nodes.length * 3);
         const sizes = new Float32Array(app.nodes.length);
         const opacities = new Float32Array(app.nodes.length);
-        const colorA = app.theme.nodeA;
-        const colorB = app.theme.nodeB;
 
         app.nodes.forEach((n, i) => {
           positions[i * 3] = n.pos.x;
           positions[i * 3 + 1] = n.pos.y;
           positions[i * 3 + 2] = n.pos.z;
-          const c = n.colorIdx === 0 ? colorA : colorB;
+          const c = _catColors[getNodeColorKey(n)] || _catColors.default;
           colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
           sizes[i] = n.scale;
           opacities[i] = n.opacity;
@@ -8651,6 +8898,8 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
         const linkColors = new Float32Array(app.links.length * 6);
         const linkAlphas = new Float32Array(app.links.length * 2);
         const lc = app.theme.link;
+        const hubLinkC = app.theme.pulse;
+        const crossC = app.theme.nodeB;
 
         // Assign linkAlphaScale BEFORE using it in the loop below
         app.linkAlphaScale = getLinkAlphaScale(app.links.length);
@@ -8661,10 +8910,11 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
           const idx = i * 6;
           linkPos[idx] = a.pos.x; linkPos[idx + 1] = a.pos.y; linkPos[idx + 2] = a.pos.z;
           linkPos[idx + 3] = b.pos.x; linkPos[idx + 4] = b.pos.y; linkPos[idx + 5] = b.pos.z;
+          const c = l.type === 'cross' ? crossC : (a.level === 0 || b.level === 0 ? hubLinkC : lc);
           for (let k = 0; k < 2; k++) {
-            linkColors[idx + k * 3] = lc.r;
-            linkColors[idx + k * 3 + 1] = lc.g;
-            linkColors[idx + k * 3 + 2] = lc.b;
+            linkColors[idx + k * 3] = c.r;
+            linkColors[idx + k * 3 + 1] = c.g;
+            linkColors[idx + k * 3 + 2] = c.b;
             const base = app.theme.linkOpacity * app.linkAlphaScale;
             linkAlphas[i * 2 + k] = l.type === 'branch' ? base : base * 0.7;
           }
@@ -8870,8 +9120,6 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
           const sizes = app.nodeMesh.geometry.attributes.size.array;
           const alphas = app.nodeMesh.geometry.attributes.alpha.array;
           const colors = app.nodeMesh.geometry.attributes.color.array;
-          const colorA = app.theme.nodeA;
-          const colorB = app.theme.nodeB;
 
           // hitMesh only needs refreshing when node positions change (layout/growth)
           // or when hover/pin state changes (marked via _hitMeshDirty). Static periods
@@ -8895,9 +9143,8 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
             const hoverAlpha = (isHighlighted || isPinned) ? 1 : baseAlpha;
             alphas[i] = hoverAlpha * (0.85 + breathGlow * 0.15 * dreamFactor);
 
-            const c = n.colorIdx === 0 ? colorA : colorB;
-            const sparkColor = isSpark ? app.theme.pulse : c;
-            colors[i * 3] = sparkColor.r; colors[i * 3 + 1] = sparkColor.g; colors[i * 3 + 2] = sparkColor.b;
+            const c = _catColors[getNodeColorKey(n)] || _catColors.default;
+            colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
 
             if (updateHitMesh) {
               _animDummy.position.copy(n.pos);
@@ -8954,6 +9201,8 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
             if (positions[i * 3] < -60) positions[i * 3] = 60;
             if (positions[i * 3 + 1] > 40) positions[i * 3 + 1] = -40;
             if (positions[i * 3 + 1] < -40) positions[i * 3 + 1] = 40;
+            if (positions[i * 3 + 2] > 20) positions[i * 3 + 2] = -50;
+            if (positions[i * 3 + 2] < -50) positions[i * 3 + 2] = 20;
           }
           app.particleSystem.geometry.attributes.position.needsUpdate = true;
           app.particleSystem.material.color.copy(app.theme.nodeA);
@@ -9068,9 +9317,10 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
         const linked = app.links.filter(l => l.source === node._idx || l.target === node._idx);
         linked.forEach((l, i) => {
           const other = l.source === node._idx ? app.nodes[l.target] : app.nodes[l.source];
+          if (!other) return;
           app.pulses.push({
-            from: node.pos.clone(),
-            to: other.pos.clone(),
+            fromNode: node._idx,
+            toNode: other._idx,
             t: 0,
             speed: CONFIG.pulseSpeed * (0.85 + Math.random() * 0.3),
             delay: i * 0.08,
@@ -9089,10 +9339,14 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
           p.t += dt * p.speed;
           if (p.t >= 1) { app.pulses.splice(i, 1); continue; }
           if (idx < count) {
-            pos[idx * 3] = lerp(p.from.x, p.to.x, p.t);
-            pos[idx * 3 + 1] = lerp(p.from.y, p.to.y, p.t);
-            pos[idx * 3 + 2] = lerp(p.from.z, p.to.z, p.t);
-            idx++;
+            const fn = app.nodes[p.fromNode];
+            const tn = app.nodes[p.toNode];
+            if (fn && tn) {
+              pos[idx * 3] = lerp(fn.pos.x, tn.pos.x, p.t);
+              pos[idx * 3 + 1] = lerp(fn.pos.y, tn.pos.y, p.t);
+              pos[idx * 3 + 2] = lerp(fn.pos.z, tn.pos.z, p.t);
+              idx++;
+            }
           }
         }
         for (let k = idx; k < count; k++) { pos[k * 3] = 0; pos[k * 3 + 1] = 0; pos[k * 3 + 2] = -1000; }
@@ -9358,6 +9612,7 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
         const nextKey = next || keys[(idx + 1) % keys.length];
         const newTheme = THEMES[nextKey];
         app.theme = newTheme;
+        _catColors = computeCategoryColors(newTheme);
 
         triggerScanline();
         addLog(`THEME SWITCH: ${newTheme.name}`);
@@ -9780,6 +10035,9 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
         setTimeout(() => {
           document.getElementById('intro-hint').classList.remove('visible');
           DOM.hud.classList.remove('ui-hidden');
+          let seen = false;
+          try { seen = !!localStorage.getItem(TOUR_KEY); } catch (err) {}
+          if (!seen) setTimeout(() => tour.start(), 700);
         }, 3200);
 
         animate();
@@ -9796,6 +10054,164 @@ function isCJK(s) { return /[\u4e00-\u9fa5]/.test(s); }
           ...(t.agent || []), ...(t.target || []), ...(t.tool || [])
         ];
       }
+
+      // ===== Onboarding Tour =====
+      const TOUR_KEY = 'nf_tour_done_v1';
+      const TOUR_GLYPHS = {
+        hover: '<svg viewBox="0 0 132 64" fill="none"><g class="g-link"><path d="M62 32 L18 12"/><circle cx="18" cy="12" r="4"/></g><g class="g-link d1"><path d="M62 32 L114 18"/><circle cx="114" cy="18" r="4"/></g><g class="g-link d2"><path d="M62 32 L20 54"/><circle cx="20" cy="54" r="4"/></g><g class="g-link d3"><path d="M62 32 L112 52"/><circle cx="112" cy="52" r="4"/></g><circle class="g-halo" cx="62" cy="32" r="9"/><circle class="g-node" cx="62" cy="32" r="9"/></svg>',
+        pin: '<svg viewBox="0 0 132 64" fill="none"><g class="g-link"><path d="M62 32 L18 12"/><circle cx="18" cy="12" r="4"/></g><g class="g-link d1"><path d="M62 32 L114 18"/><circle cx="114" cy="18" r="4"/></g><g class="g-link d2"><path d="M62 32 L20 54"/><circle cx="20" cy="54" r="4"/></g><g class="g-link d3"><path d="M62 32 L112 52"/><circle cx="112" cy="52" r="4"/></g><circle class="g-flash f1" cx="62" cy="32" r="9"/><circle class="g-flash f2" cx="62" cy="32" r="9"/><circle class="g-node gold" cx="62" cy="32" r="9"/><path class="g-anchor" d="M62 18 v5 m-7 7 h14 v-3 a7 7 0 0 0 -14 0 z"/></svg>',
+        nav: '<svg viewBox="0 0 132 64" fill="none"><g class="g-ring" transform="translate(66,32)"><path d="M0 -24 A24 24 0 0 1 20.78 -12"/><path d="M20.78 -12 A24 24 0 0 1 20.78 12"/><path d="M20.78 12 A24 24 0 0 1 0 24"/><path d="M0 24 A24 24 0 0 1 -20.78 12"/><path d="M-20.78 12 A24 24 0 0 1 -20.78 -12"/><path d="M-20.78 -12 A24 24 0 0 1 0 -24"/></g><text class="g-navc" x="66" y="36" text-anchor="middle">NAV</text></svg>',
+        settings: '<svg viewBox="0 0 132 64" fill="none"><g class="g-slider"><line x1="18" y1="40" x2="114" y2="40"/><g class="g-thumb-g"><circle cx="18" cy="40" r="6"/><line x1="18" y1="29" x2="18" y2="51"/></g><text class="g-sv s1" x="18" y="22" text-anchor="middle">320</text><text class="g-sv s2" x="66" y="22" text-anchor="middle">420</text><text class="g-sv s3" x="114" y="22" text-anchor="middle">800</text></g></svg>'
+      };
+      const TOUR_STEPS = [
+        {
+          id: 'hover', zh: '悬停高亮', en: 'Hover Highlight',
+          spot: () => ({ x: window.innerWidth / 2, y: window.innerHeight * 0.42, r: 108 }),
+          card: { centerX: true, bottom: '104px' },
+          text: '鼠标划过节点，它会放大、发亮，与它相连的所有连接线也会一起点亮——词语与词语之间的关系，在森林里一眼可见。',
+          hint: '试试：把鼠标移到森林里的节点上',
+          doneWhen: () => !!app.hoveredNode,
+          after: null, before: null,
+        },
+        {
+          id: 'pin', zh: '双击固定', en: 'Double-Click to Pin',
+          spot: () => ({ x: window.innerWidth / 2, y: window.innerHeight * 0.42, r: 108 }),
+          card: { centerX: true, bottom: '104px' },
+          text: '双击一个节点，它会被固定（PIN）在原地，变成金色锚点；再次双击即可释放，让它重新融入森林的呼吸。',
+          hint: '试试：双击一个节点，再双击一次释放',
+          doneWhen: () => app.pinnedNodes.size > 0,
+          after: null, before: null,
+        },
+        {
+          id: 'nav', zh: '环形导航', en: 'Ring Navigation',
+          spot: () => { const r = document.getElementById('ring-nav').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 2 + 14 }; },
+          card: { right: '214px', top: '50%', centerY: true },
+          text: '左下角是森林的环形控制台：切换主题、环绕与自由视角、进入梦境、冻结漂移、截图与重置视角，都从这里出发。',
+          hint: '点击环形上的任意图标即可触发功能',
+          doneWhen: null,
+          after: () => { document.getElementById('ring-nav').classList.add('tour-demo'); },
+          before: () => { document.getElementById('ring-nav').classList.remove('tour-demo'); },
+        },
+        {
+          id: 'settings', zh: '高级参数', en: 'Advanced Settings',
+          spot: () => { const r = document.getElementById('settings-toggle').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: 56 }; },
+          card: { right: '36px', top: '128px' },
+          text: '左上角齿轮打开高级参数：森林规模、生长速度、呼吸周期、节点亮度……每一片森林，都可以按你的口味调校。',
+          hint: '拖动滑块，参数即时生效',
+          doneWhen: null,
+          after: () => {
+            if (!DOM.settingsPanel.classList.contains('visible')) {
+              DOM.settingsPanel.classList.add('visible');
+              DOM.settingsToggle.classList.add('active');
+            }
+          },
+          before: null,
+        },
+      ];
+
+      const tour = {
+        active: false, step: 0, timer: null,
+        els: null,
+        init() {
+          this.els = {
+            overlay: document.getElementById('tour-overlay'),
+            spot: document.querySelector('#tour-overlay .spot'),
+            ring: document.getElementById('tour-ring'),
+            card: document.getElementById('tour-card'),
+            no: document.querySelector('#tour-card .tour-no'),
+            zh: document.querySelector('#tour-card .tour-zh'),
+            en: document.querySelector('#tour-card .tour-en'),
+            glyph: document.querySelector('#tour-card .tour-glyph'),
+            text: document.querySelector('#tour-card .tour-text'),
+            hint: document.querySelector('#tour-card .tour-hint'),
+            dots: document.querySelector('#tour-card .tour-dots'),
+            skip: document.getElementById('tour-skip'),
+            prev: document.getElementById('tour-prev'),
+            next: document.getElementById('tour-next'),
+            replay: document.getElementById('tour-replay'),
+          };
+          this.els.skip.addEventListener('click', () => this.end());
+          this.els.prev.addEventListener('click', () => this.show(this.step - 1));
+          this.els.next.addEventListener('click', () => {
+            if (this.step >= TOUR_STEPS.length - 1) this.end();
+            else this.show(this.step + 1);
+          });
+          this.els.replay.addEventListener('click', () => this.start());
+          window.addEventListener('keydown', (e) => {
+            if (!this.active) return;
+            if (e.key === 'Escape') this.end();
+            else if (e.key === 'ArrowRight') { this.els.next.click(); }
+            else if (e.key === 'ArrowLeft') this.show(this.step - 1);
+          });
+        },
+        start() {
+          if (this.active) return;
+          this.active = true;
+          this.els.replay.classList.add('hidden');
+          this.show(0);
+        },
+        end() {
+          this.active = false;
+          clearInterval(this.timer);
+          TOUR_STEPS.forEach(s => s.before && s.before());
+          this.els.overlay.classList.remove('on');
+          this.els.card.classList.remove('on');
+          this.els.ring.classList.remove('on');
+          this.els.replay.classList.remove('hidden');
+          try { localStorage.setItem(TOUR_KEY, '1'); } catch (err) {}
+        },
+        show(i) {
+          if (i < 0 || i >= TOUR_STEPS.length) return;
+          this.step = i;
+          clearInterval(this.timer);
+          TOUR_STEPS.forEach(s => s.before && s.before());
+          const s = TOUR_STEPS[i];
+          const E = this.els;
+          E.card.classList.remove('done-step');
+          E.no.textContent = (i + 1).toString().padStart(2, '0') + ' / ' + TOUR_STEPS.length.toString().padStart(2, '0');
+          E.zh.textContent = s.zh;
+          E.en.textContent = s.en;
+          E.glyph.innerHTML = TOUR_GLYPHS[s.id];
+          E.text.textContent = s.text;
+          E.hint.textContent = s.hint;
+          E.hint.style.display = s.hint ? '' : 'none';
+          E.dots.innerHTML = TOUR_STEPS.map((_, k) => `<i class="${k === i ? 'cur' : ''}${k < i ? ' done' : ''}"></i>`).join('');
+          E.prev.disabled = i === 0;
+          E.next.textContent = i === TOUR_STEPS.length - 1 ? '开始探索' : '下一步';
+          const pos = s.card;
+          E.card.style.left = E.card.style.right = E.card.style.top = E.card.style.bottom = '';
+          E.card.style.marginLeft = E.card.style.marginTop = '';
+          if (pos.left !== undefined) E.card.style.left = pos.left;
+          if (pos.right !== undefined) E.card.style.right = pos.right;
+          if (pos.top !== undefined) E.card.style.top = pos.top;
+          if (pos.bottom !== undefined) E.card.style.bottom = pos.bottom;
+          if (pos.centerX) { E.card.style.left = '50%'; E.card.style.marginLeft = -(E.card.offsetWidth / 2) + 'px'; }
+          if (pos.centerY) { E.card.style.top = '50%'; E.card.style.marginTop = -(E.card.offsetHeight / 2) + 'px'; }
+          const t = s.spot();
+          E.spot.style.setProperty('--sx', t.x + 'px');
+          E.spot.style.setProperty('--sy', t.y + 'px');
+          E.spot.style.setProperty('--sr', t.r + 'px');
+          E.ring.style.left = (t.x - t.r) + 'px';
+          E.ring.style.top = (t.y - t.r) + 'px';
+          E.ring.style.width = (t.r * 2) + 'px';
+          E.ring.style.height = (t.r * 2) + 'px';
+          E.overlay.classList.add('on');
+          E.card.classList.add('on');
+          E.ring.classList.add('on');
+          if (s.doneWhen) {
+            this.timer = setInterval(() => {
+              if (!this.active || this.step !== i) return;
+              if (s.doneWhen()) {
+                clearInterval(this.timer);
+                E.card.classList.add('done-step');
+                setTimeout(() => { if (this.active && this.step === i) this.show(i + 1); }, 1100);
+              }
+            }, 350);
+          }
+          if (s.after) s.after();
+        }
+      };
+      tour.init();
 
       boot();
     })();
