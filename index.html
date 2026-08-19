@@ -2469,9 +2469,22 @@ html[data-theme="light"] header[data-component="Top Nav"].scrolled::after{opacit
 
   applyStatics();
   frame();
-  /* re-theme on toggle: palette + light-mode cost profile (dpr / threads / grain) */
+  /* re-theme on toggle: palette + light-mode cost profile (dpr / threads / grain).
+     The render-loop on/off is forced synchronously by theme direction — the
+     IntersectionObserver is unreliable across display:none<->block flips and may
+     never re-fire after the container is unhidden. Only the box measurement is
+     deferred to a rAF so the CSS display switch is applied first. */
   if("MutationObserver" in window){
-    new MutationObserver(function(){ applyStatics(); resize(); frame(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    new MutationObserver(function(){
+      var dark = currentTheme() !== "light";
+      applyStatics();
+      if(dark){ isVisible = true; tryStart(); }
+      else { isVisible = false; tryStop(); }
+      requestAnimationFrame(function(){
+        resize();
+        frame();
+      });
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   }
   if(!(reduced && reduced.matches)) tryStart();
 })();
